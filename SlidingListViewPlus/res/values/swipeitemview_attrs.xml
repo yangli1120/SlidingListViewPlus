@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SwipeItemView">
+        <attr name="primaryView" format="reference"/>
+        <attr name="slidingView" format="reference"/>
+        <attr name="enableSliding" format="boolean"/>
+    </declare-styleable>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res/per.learn.wechatswipelistview">
+    <per.learn.wechatswipelistview.lib.SwipeItemView
+        android:id="@+id/swipe_item_view"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        app:enableSliding="true"
+        app:primaryView="@layout/layout_item_primary_view"
+        app:slidingView="@layout/layout_item_sliding_view" />
+</RelativeLayout>
