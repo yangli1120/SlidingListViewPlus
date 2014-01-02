@@ -56,10 +56,27 @@ public class SwipeListView extends ListView{
     public boolean onTouchEvent(MotionEvent ev) {
 
         if(mCancelMotionEvent && ev.getAction() == MotionEvent.ACTION_DOWN) {
-            ev.setAction(MotionEvent.ACTION_CANCEL);
+            //ev.setAction(MotionEvent.ACTION_CANCEL);
+            hideShowingItem();
+
+            return true;
         } else if(mCancelMotionEvent && ev.getAction() == MotionEvent.ACTION_MOVE) {
-            Log.i("Young Lee", "cancel ACTION_MOVE");
-            return super.onTouchEvent(ev);
+            //why I use scrollBy() but not scrollToWithAnimation() here? I had tried
+            //scrollToWithAnimation() first, but I found when the View was handling
+            //the touch event, the Scroller.startScroll() can not work, I don't know
+            //why, so I only can use the scrollBy() the hide the showing item of the
+            //ListView :(, anyway, the scrollBy() can work anytime, thank to google.
+            if(mSwipeItemView.getCurrentScrollX() > 0) {
+                mSwipeItemView.scrollBy(-1, 0);
+            }
+
+            return true;
+        } else if(mCancelMotionEvent && ev.getAction() == MotionEvent.ACTION_UP) {
+            Log.i("Young Lee", "cancel action up, getCurrentScrollX() = " + mSwipeItemView.getCurrentScrollX());
+            hideShowingItem();
+            mCancelMotionEvent = false;
+
+            return true;
         }
 
         switch(ev.getAction()) {

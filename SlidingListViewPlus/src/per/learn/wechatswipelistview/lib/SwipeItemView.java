@@ -39,6 +39,7 @@ public class SwipeItemView extends ViewGroup {
 
     private void init(Context context, AttributeSet attrs) {
         mScroller = new Scroller(context);
+        mScroller.forceFinished(false);
 
         if(attrs != null) {
             TypedArray styled = getContext().obtainStyledAttributes(
@@ -108,6 +109,14 @@ public class SwipeItemView extends ViewGroup {
     public void scrollToWithAnimation(int scrollX, int scrollY) {
         mScroller.startScroll(getScrollX(), getScrollY(),
                 scrollX - getScrollX(), getScrollY() - scrollY, 300);
+    }
+
+    public boolean isScrollerFinished() {
+        return mScroller.isFinished();
+    }
+
+    public int getCurrentScrollX() {
+        return mScroller.getCurrX();
     }
 
     public View getSlidingView() {
