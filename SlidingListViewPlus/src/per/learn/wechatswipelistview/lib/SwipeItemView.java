@@ -1,12 +1,11 @@
 package per.learn.wechatswipelistview.lib;
 
 import per.learn.wechatswipelistview.R;
+import per.learn.wechatswipelistview.util.LogUtil;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Scroller;
@@ -15,8 +14,6 @@ public class SwipeItemView extends ViewGroup {
 
     private int mPrimaryViewID = -1, mSlidingViewID = -1;
     private boolean mEnableSliding = true;
-
-    private float mLastMotionX, mLastMotionY;
 
     private View mPrimaryView, mSlidingView;
 
@@ -41,6 +38,8 @@ public class SwipeItemView extends ViewGroup {
         mScroller = new Scroller(context);
         mScroller.forceFinished(false);
 
+        setClickable(true);
+
         if(attrs != null) {
             TypedArray styled = getContext().obtainStyledAttributes(
                     attrs, R.styleable.SwipeItemView);
@@ -59,10 +58,12 @@ public class SwipeItemView extends ViewGroup {
 
         mPrimaryView = LayoutInflater.from(getContext()).inflate(
                 mPrimaryViewID, null);
+        mPrimaryView.setClickable(false);
         addView(mPrimaryView, 0);
         if(mSlidingViewID != -1) {
             mSlidingView = LayoutInflater.from(getContext()).inflate(
                     mSlidingViewID, null);
+            mSlidingView.setClickable(false);
             addView(mSlidingView, 1);
         }
     }
@@ -80,11 +81,34 @@ public class SwipeItemView extends ViewGroup {
             throw new IllegalStateException(
                     "heightMode, only run at MeasureSpec.EXACTLY mode");*/
 
-        mPrimaryView.measure(widthMeasureSpec, heightMeasureSpec);
-        if(mSlidingView != null) {
-            int width = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-            int height = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-            mSlidingView.measure(width, height);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+
+        if(heightSize != heightMeasureSpec) {
+            mPrimaryView.measure(MeasureSpec.makeMeasureSpec(widthSize, widthMode),
+                    MeasureSpec.makeMeasureSpec(heightSize, heightMode));
+
+            if(mSlidingView != null) {
+                mSlidingView.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
+                        MeasureSpec.makeMeasureSpec(heightSize, heightMode));
+            }
+
+            LogUtil.Log("SwipeItemView.onMeasure(), heightSize = " + heightSize
+                    + ", widthSize = " + widthSize
+                    + ", heightMode = " + (heightMode == MeasureSpec.AT_MOST ? "AT_MOST"
+                            : (heightMode == MeasureSpec.EXACTLY ? "EXACTLY" : "UNSPECIFIED"))
+                    + ", widthMode = " + (widthMode == MeasureSpec.AT_MOST ? "AT_MOST"
+                            : (widthMode == MeasureSpec.EXACTLY ? "EXACTLY" : "UNSPECIFIED")));
+        } else {
+            mPrimaryView.measure(widthMeasureSpec, heightMeasureSpec);
+            if(mSlidingView != null)
+                mSlidingView.measure(widthMeasureSpec, heightMeasureSpec);
+
+            LogUtil.Log("SwipeItemView.onMeasure()"
+                    + ", widthMeasureSpec = " + widthMeasureSpec
+                    + ", heightMeasureSpec = " + heightMeasureSpec);
         }
     }
 
@@ -98,9 +122,20 @@ public class SwipeItemView extends ViewGroup {
     @Override
     public void computeScroll() {
         if(mScroller.computeScrollOffset()) {
-            Log.i("Young Lee", "computeScroll(), getCurrX() = " + mScroller.getCurrX());
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
         }
+    }
+
+    @Override
+    public void scrollBy(int x, int y) {
+        if(mEnableSliding)
+            super.scrollBy(x, y);
+    }
+
+    @Override
+    public void scrollTo(int x, int y) {
+        if(mEnableSliding)
+            super.scrollTo(x, y);
     }
 
     /**
@@ -111,15 +146,31 @@ public class SwipeItemView extends ViewGroup {
                 scrollX - getScrollX(), getScrollY() - scrollY, 300);
     }
 
+    /**
+     * return if scroller is finished or not
+     * */
     public boolean isScrollerFinished() {
         return mScroller.isFinished();
     }
 
+    /**
+     * return scroller.getCurrX()
+     * */
     public int getCurrentScrollX() {
         return mScroller.getCurrX();
     }
 
+    /**
+     * return the mSlidingView
+     * */
     public View getSlidingView() {
         return mSlidingView;
+    }
+
+    /**
+     * set the SwipeItemView should enable sliding or not
+     * */
+    public void setEnableSliding(boolean enable) {
+        mEnableSliding = enable;
     }
 }

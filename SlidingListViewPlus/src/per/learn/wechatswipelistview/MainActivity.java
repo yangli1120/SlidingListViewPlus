@@ -8,14 +8,15 @@ import per.learn.wechatswipelistview.util.Util;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -33,6 +34,26 @@ public class MainActivity extends Activity {
         mSwipeLv = (SwipeListView)findViewById(R.id.swipe_lv);
         mAdapter = new MyAdapter(this, arrays);
         mSwipeLv.setAdapter(mAdapter);
+        mSwipeLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                    int position, long id) {
+                Toast.makeText(getApplicationContext(), "Click Item " + position,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+        mSwipeLv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view,
+                    int position, long id) {
+                Toast.makeText(getApplicationContext(), "Long click item " + position,
+                        Toast.LENGTH_SHORT).show();
+
+                return true;
+            }
+        });
     }
 
     @Override
@@ -86,6 +107,22 @@ public class MainActivity extends Activity {
             }
 
             holder.mContentTv.setText(datas.get(position));
+            holder.mDeleteBtn.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(mContext, "click delete button!",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+            holder.mTopBtn.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(mContext, "click top button!",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
 
             return convertView;
         }

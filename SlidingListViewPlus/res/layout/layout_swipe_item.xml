@@ -8,6 +8,7 @@
         android:id="@+id/swipe_item_view"
         android:layout_width="match_parent"
         android:layout_height="70dp"
+        android:clickable="true"
         app:enableSliding="true"
         app:primaryView="@layout/layout_item_primary_view"
         app:slidingView="@layout/layout_item_sliding_view" />

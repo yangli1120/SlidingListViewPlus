@@ -1,9 +1,9 @@
 package per.learn.wechatswipelistview.lib;
 
 import per.learn.wechatswipelistview.R;
+import per.learn.wechatswipelistview.util.LogUtil;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -20,7 +20,7 @@ public class SwipeListView extends ListView{
     public static final int MIN_VELOCITY = ViewConfiguration.getMinimumFlingVelocity() * 10;
     public static final int TOUCH_SLOP = ViewConfiguration.getTouchSlop();
 
-    private float mActionDownX,mActionDownY, mLastMotionX, mLastMotionY;
+    private float mActionDownX, mActionDownY, mLastMotionX, mLastMotionY;
     private int mLastShowingPos = -1;
 
     private int mScrollDirection = DIRECTION_UNKNOW;
@@ -46,6 +46,7 @@ public class SwipeListView extends ListView{
         init(attrs);
     }
 
+    //TODO: implement the initialize work
     private void init(AttributeSet attrs) {
         if(attrs != null) {
             
@@ -63,8 +64,9 @@ public class SwipeListView extends ListView{
         } else if(mCancelMotionEvent && ev.getAction() == MotionEvent.ACTION_MOVE) {
             //why I use scrollBy() but not scrollToWithAnimation() here? I had tried
             //scrollToWithAnimation() first, but I found when the View was handling
-            //the touch event, the Scroller.startScroll() can not work, I don't know
-            //why, so I only can use the scrollBy() the hide the showing item of the
+            //the touch event, the Scroller.startScroll() can not work, even
+            //Scroller.computeScrollOffset() return true... I don't know why,
+            //so I only can use the scrollBy() the hide the showing item of the
             //ListView :(, anyway, the scrollBy() can work anytime, thank to google.
             if(mSwipeItemView.getCurrentScrollX() > 0) {
                 mSwipeItemView.scrollBy(-1, 0);
@@ -72,7 +74,7 @@ public class SwipeListView extends ListView{
 
             return true;
         } else if(mCancelMotionEvent && ev.getAction() == MotionEvent.ACTION_UP) {
-            Log.i("Young Lee", "cancel action up, getCurrentScrollX() = " + mSwipeItemView.getCurrentScrollX());
+            LogUtil.Log("cancel action up, getCurrentScrollX() = " + mSwipeItemView.getCurrentScrollX());
             hideShowingItem();
             mCancelMotionEvent = false;
 
@@ -81,6 +83,7 @@ public class SwipeListView extends ListView{
 
         switch(ev.getAction()) {
             case MotionEvent.ACTION_DOWN: {
+                LogUtil.Log("ACTION_DOWN");
                 if(mTracker == null) {
                     mTracker = VelocityTracker.obtain();
                 } else {
@@ -105,9 +108,9 @@ public class SwipeListView extends ListView{
                 int distanceX = (int)(mLastMotionX - curX);
                 int distanceY = (int)(mLastMotionY - curY);
                 if(mScrollDirection == DIRECTION_UNKNOW)
-                    Log.i("Young Lee", "abs(distanceX) = " + Math.abs(distanceX)
+                    /*LogUtil.Log("abs(distanceX) = " + Math.abs(distanceX)
                             + ", abs(distanceY) = " + Math.abs(distanceY)
-                            + ", TOUCH_SLOP = " + TOUCH_SLOP);
+                            + ", TOUCH_SLOP = " + TOUCH_SLOP)*/;
                 if(mScrollDirection == DIRECTION_UNKNOW
                         && Math.abs(distanceY) <= Math.abs(distanceX))
                     mScrollDirection = DIRECTION_HORIZONTAL;
@@ -150,6 +153,7 @@ public class SwipeListView extends ListView{
             }break;
 
             case MotionEvent.ACTION_UP: {
+                LogUtil.Log("ACTION_UP");
                 if(mTracker != null) {
                     mTracker.clear();
                     mTracker.recycle();
@@ -176,7 +180,6 @@ public class SwipeListView extends ListView{
             }break;
 
             case MotionEvent.ACTION_CANCEL: {
-                Log.i("Young Lee", "ACTION_CANCEL");
                 hideShowingItem();
             }break;
         }
@@ -187,16 +190,22 @@ public class SwipeListView extends ListView{
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         if(mLastShowingPos != -1
-                && ev.getAction() == MotionEvent.ACTION_DOWN) {
+                && ev.getAction() == MotionEvent.ACTION_DOWN
+                && !isClickChildView(ev)) {
             mCancelMotionEvent = true;
 
+            return true;
+        } else if(mLastShowingPos == -1
+                && ev.getAction() == MotionEvent.ACTION_DOWN) {
             return true;
         }
 
         return super.onInterceptTouchEvent(ev);
     }
 
-    //TODO: hide the showing item
+    /**
+     * hide the current sliding item with animation
+     * */
     private void hideShowingItem() {
         if(mLastShowingPos != -1) {
             int firstVisibleItemPos = getFirstVisiblePosition()
@@ -212,6 +221,9 @@ public class SwipeListView extends ListView{
         }
     }
 
+    /**
+     * open current sliding item with animation
+     * */
     private void openShowingItem() {
         if(mLastShowingPos != -1) {
             int firstVisibleItemPos = getFirstVisiblePosition()
@@ -227,7 +239,9 @@ public class SwipeListView extends ListView{
         }
     }
 
-    //TODO: ensure if the item need show or hide
+    /**
+     * make sure that the current sliding item need open or hide
+     * */
     private void ensureIfItemOpenOrHide() {
         if(mLastShowingPos != -1) {
             int firstVisibleItemPos = getFirstVisiblePosition()
@@ -238,7 +252,7 @@ public class SwipeListView extends ListView{
                 mSwipeItemView = (SwipeItemView)mItemView.findViewById(R.id.swipe_item_view);
                 if(mSwipeItemView.getSlidingView() != null &&
                         mSwipeItemView.getScrollX() >=
-                                mSwipeItemView.getSlidingView().getWidth() / 3) {
+                                mSwipeItemView.getSlidingView().getWidth() / 2) {
                     openShowingItem();
                 } else if(mSwipeItemView.getSlidingView() != null) {
                     hideShowingItem();
@@ -247,8 +261,40 @@ public class SwipeListView extends ListView{
         }
     }
 
-    //TODO: ensure if this event is click the child view of the showing item
+    /**
+     * make sure if user is click showing item's sliding part
+     * */
     private boolean isClickChildView(MotionEvent event) {
+        if(mLastShowingPos != -1) {
+            int firstVisibleItemPos = getFirstVisiblePosition()
+                    - getHeaderViewsCount();
+            int factPos = mLastShowingPos - firstVisibleItemPos;
+            mItemView = getChildAt(factPos);
+            if(mItemView != null) {
+                mSwipeItemView = (SwipeItemView)mItemView.findViewById(R.id.swipe_item_view);
+                View slidingView = mSwipeItemView.getSlidingView();
+                if(slidingView != null) {
+                    int[] slidingViewLocation = new int[2];
+                    slidingView.getLocationOnScreen(slidingViewLocation);
+
+                    int left = slidingViewLocation[0];
+                    int right = slidingViewLocation[0] + slidingView.getWidth();
+                    int top = slidingViewLocation[1];
+                    int bottom = slidingViewLocation[1] + slidingView.getHeight();
+
+                    LogUtil.Log("event.getRawX() = " + event.getRawX()
+                            + ", event.getRawY() = " + event.getRawY()
+                            + ", left = " + left
+                            + ", right = " + right
+                            + ", top = " + top
+                            + ", bottom = " + bottom);
+
+                    return (event.getRawX() > left && event.getRawX() < right
+                            && event.getRawY() > top && event.getRawY() < bottom);
+                }
+            }
+        }
+
         return false;
     }
 

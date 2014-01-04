@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:background="@android:color/black" >
+    android:background="@android:color/darker_gray" >
     <Button
         android:id="@+id/delete_btn"
         android:layout_width="100dp"
@@ -12,7 +12,10 @@
         android:text="DELETE"
         android:textColor="@android:color/black"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:background="@drawable/button_bg"/>
     <Button
         android:id="@+id/top_btn"
         android:layout_width="100dp"
@@ -21,5 +24,8 @@
         android:text="TOP"
         android:textColor="@android:color/black"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:background="@drawable/button_bg"/>
 </LinearLayout>
