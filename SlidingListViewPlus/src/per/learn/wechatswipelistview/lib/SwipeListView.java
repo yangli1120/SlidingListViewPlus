@@ -58,6 +58,7 @@ public class SwipeListView extends ListView{
 
         if(mCancelMotionEvent && ev.getAction() == MotionEvent.ACTION_DOWN) {
             //ev.setAction(MotionEvent.ACTION_CANCEL);
+            LogUtil.Log("SwipeListView.onTouchEvent(), cancel ACTION_DOWN");
             hideShowingItem();
 
             return true;
@@ -67,15 +68,19 @@ public class SwipeListView extends ListView{
             //the touch event, the Scroller.startScroll() can not work, even
             //Scroller.computeScrollOffset() return true... I don't know why,
             //so I only can use the scrollBy() the hide the showing item of the
-            //ListView :(, anyway, the scrollBy() can work anytime, thank to google.
+            //ListView :(, anyway, the scrollBy() can work anytime, thank to google.  - 2014.01.02
+            //Then I find just call computeScroll(), the scroller's animation will
+            //go on working. - 2014.01.04
             if(mSwipeItemView.getCurrentScrollX() > 0) {
-                mSwipeItemView.scrollBy(-1, 0);
+                LogUtil.Log("SwipeListView.onTouchEvent(), cancel ACTION_MOVE");
+                mSwipeItemView.computeScroll();
+                //mSwipeItemView.scrollBy(-1, 0);
             }
 
             return true;
         } else if(mCancelMotionEvent && ev.getAction() == MotionEvent.ACTION_UP) {
-            LogUtil.Log("cancel action up, getCurrentScrollX() = " + mSwipeItemView.getCurrentScrollX());
-            hideShowingItem();
+            LogUtil.Log("SwipeListView.onTouchEvent(), cancel ACTION_UP"
+                    + ", getCurrentScrollX() = " + mSwipeItemView.getCurrentScrollX());
             mCancelMotionEvent = false;
 
             return true;
@@ -192,6 +197,7 @@ public class SwipeListView extends ListView{
         if(mLastShowingPos != -1
                 && ev.getAction() == MotionEvent.ACTION_DOWN
                 && !isClickChildView(ev)) {
+            LogUtil.Log("SwipeListView.onInterceptTouchEvent(), intercept ACTION_DOWN");
             mCancelMotionEvent = true;
 
             return true;
@@ -208,11 +214,13 @@ public class SwipeListView extends ListView{
      * */
     private void hideShowingItem() {
         if(mLastShowingPos != -1) {
+            LogUtil.Log("SwipeListView.hideShowingItem(), 1");
             int firstVisibleItemPos = getFirstVisiblePosition()
                     - getHeaderViewsCount();
             int factPos = mLastShowingPos - firstVisibleItemPos;
             mItemView = getChildAt(factPos);
             if(mItemView != null) {
+                LogUtil.Log("SwipeListView.hideShowingItem(), 2");
                 mSwipeItemView = (SwipeItemView)mItemView.findViewById(R.id.swipe_item_view);
                 mSwipeItemView.scrollToWithAnimation(0, 0);
             }
@@ -281,13 +289,6 @@ public class SwipeListView extends ListView{
                     int right = slidingViewLocation[0] + slidingView.getWidth();
                     int top = slidingViewLocation[1];
                     int bottom = slidingViewLocation[1] + slidingView.getHeight();
-
-                    LogUtil.Log("event.getRawX() = " + event.getRawX()
-                            + ", event.getRawY() = " + event.getRawY()
-                            + ", left = " + left
-                            + ", right = " + right
-                            + ", top = " + top
-                            + ", bottom = " + bottom);
 
                     return (event.getRawX() > left && event.getRawX() < right
                             && event.getRawY() > top && event.getRawY() < bottom);

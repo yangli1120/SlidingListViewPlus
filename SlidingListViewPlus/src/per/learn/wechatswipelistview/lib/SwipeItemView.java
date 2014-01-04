@@ -36,7 +36,7 @@ public class SwipeItemView extends ViewGroup {
 
     private void init(Context context, AttributeSet attrs) {
         mScroller = new Scroller(context);
-        mScroller.forceFinished(false);
+        //mScroller.forceFinished(false);
 
         setClickable(true);
 
@@ -95,20 +95,20 @@ public class SwipeItemView extends ViewGroup {
                         MeasureSpec.makeMeasureSpec(heightSize, heightMode));
             }
 
-            LogUtil.Log("SwipeItemView.onMeasure(), heightSize = " + heightSize
+            /*LogUtil.Log("SwipeItemView.onMeasure(), heightSize = " + heightSize
                     + ", widthSize = " + widthSize
                     + ", heightMode = " + (heightMode == MeasureSpec.AT_MOST ? "AT_MOST"
                             : (heightMode == MeasureSpec.EXACTLY ? "EXACTLY" : "UNSPECIFIED"))
                     + ", widthMode = " + (widthMode == MeasureSpec.AT_MOST ? "AT_MOST"
-                            : (widthMode == MeasureSpec.EXACTLY ? "EXACTLY" : "UNSPECIFIED")));
+                            : (widthMode == MeasureSpec.EXACTLY ? "EXACTLY" : "UNSPECIFIED")));*/
         } else {
             mPrimaryView.measure(widthMeasureSpec, heightMeasureSpec);
             if(mSlidingView != null)
                 mSlidingView.measure(widthMeasureSpec, heightMeasureSpec);
 
-            LogUtil.Log("SwipeItemView.onMeasure()"
+            /*LogUtil.Log("SwipeItemView.onMeasure()"
                     + ", widthMeasureSpec = " + widthMeasureSpec
-                    + ", heightMeasureSpec = " + heightMeasureSpec);
+                    + ", heightMeasureSpec = " + heightMeasureSpec);*/
         }
     }
 
@@ -121,7 +121,10 @@ public class SwipeItemView extends ViewGroup {
 
     @Override
     public void computeScroll() {
+        LogUtil.Log("computeScroll(), mScroller.computeScrollOffset() = " + mScroller.computeScrollOffset());
         if(mScroller.computeScrollOffset()) {
+            LogUtil.Log("computeScroll(), mScroller.getCurrX() = " + mScroller.getCurrX()
+                    + ", mScroller.getCurrY() = " + mScroller.getCurrY());
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
         }
     }
@@ -142,6 +145,11 @@ public class SwipeItemView extends ViewGroup {
      * just like scrollTo(), but with animation :D
      * */
     public void scrollToWithAnimation(int scrollX, int scrollY) {
+        mScroller.abortAnimation();
+        LogUtil.Log("scrollToWithAnimation(), scrollX = " + scrollX
+                + ", scrollY = " + scrollY
+                + ", getScrollX() = " + getScrollX()
+                + ", getScrollY() = " + getScrollY());
         mScroller.startScroll(getScrollX(), getScrollY(),
                 scrollX - getScrollX(), getScrollY() - scrollY, 300);
     }
@@ -154,10 +162,10 @@ public class SwipeItemView extends ViewGroup {
     }
 
     /**
-     * return scroller.getCurrX()
+     * return getCurrX()
      * */
     public int getCurrentScrollX() {
-        return mScroller.getCurrX();
+        return getScrollX();
     }
 
     /**
