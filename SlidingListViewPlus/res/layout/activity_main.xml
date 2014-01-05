@@ -2,9 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity" xmlns:swipelistview="http://schemas.android.com/apk/res/per.learn.wechatswipelistview">
     <per.learn.wechatswipelistview.lib.SwipeListView
         android:id="@+id/swipe_lv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        swipelistview:swipeItemViewID="@+id/swipe_item_view"/>
 </RelativeLayout>

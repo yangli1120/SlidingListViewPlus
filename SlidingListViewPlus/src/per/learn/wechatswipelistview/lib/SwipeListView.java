@@ -3,6 +3,7 @@ package per.learn.wechatswipelistview.lib;
 import per.learn.wechatswipelistview.R;
 import per.learn.wechatswipelistview.util.LogUtil;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -28,6 +29,7 @@ public class SwipeListView extends ListView{
     private VelocityTracker mTracker;
     private View mItemView;
     private SwipeItemView mSwipeItemView;
+    private int mSwipeItemViewID = -1;
 
     private boolean mCancelMotionEvent = false;
 
@@ -46,15 +48,22 @@ public class SwipeListView extends ListView{
         init(attrs);
     }
 
-    //TODO: implement the initialize work
     private void init(AttributeSet attrs) {
         if(attrs != null) {
-            
+            TypedArray styled = getContext().obtainStyledAttributes(
+                    attrs, R.styleable.SwipeListView);
+
+            mSwipeItemViewID = styled.getResourceId(
+                    R.styleable.SwipeListView_swipeItemViewID, -1);
         }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+
+        //if user had not set mSwipeItemViewID, not handle any touch event
+        if(mSwipeItemViewID == -1)
+            return super.onTouchEvent(ev);
 
         if(mCancelMotionEvent && ev.getAction() == MotionEvent.ACTION_DOWN) {
             //ev.setAction(MotionEvent.ACTION_CANCEL);
@@ -133,7 +142,7 @@ public class SwipeListView extends ListView{
                 int factPos = lastPos - firstVisibleItemPos;
                 mItemView = getChildAt(factPos);
                 if(mItemView != null) {
-                    mSwipeItemView = (SwipeItemView)mItemView.findViewById(R.id.swipe_item_view);
+                    mSwipeItemView = (SwipeItemView)mItemView.findViewById(mSwipeItemViewID);
                     if(mSwipeItemView.getSlidingView() != null
                             && mSwipeItemView.getScrollX()
                                     <= mSwipeItemView.getSlidingView().getWidth()
@@ -194,6 +203,10 @@ public class SwipeListView extends ListView{
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+        //if user had not set mSwipeItemViewID, not handle any touch event
+        if(mSwipeItemViewID == -1)
+            return super.onInterceptTouchEvent(ev);
+
         if(mLastShowingPos != -1
                 && ev.getAction() == MotionEvent.ACTION_DOWN
                 && !isClickChildView(ev)) {
@@ -221,7 +234,7 @@ public class SwipeListView extends ListView{
             mItemView = getChildAt(factPos);
             if(mItemView != null) {
                 LogUtil.Log("SwipeListView.hideShowingItem(), 2");
-                mSwipeItemView = (SwipeItemView)mItemView.findViewById(R.id.swipe_item_view);
+                mSwipeItemView = (SwipeItemView)mItemView.findViewById(mSwipeItemViewID);
                 mSwipeItemView.scrollToWithAnimation(0, 0);
             }
 
@@ -239,7 +252,7 @@ public class SwipeListView extends ListView{
             int factPos = mLastShowingPos - firstVisibleItemPos;
             mItemView = getChildAt(factPos);
             if(mItemView != null) {
-                mSwipeItemView = (SwipeItemView)mItemView.findViewById(R.id.swipe_item_view);
+                mSwipeItemView = (SwipeItemView)mItemView.findViewById(mSwipeItemViewID);
                 if(mSwipeItemView.getSlidingView() != null)
                     mSwipeItemView.scrollToWithAnimation(
                             mSwipeItemView.getSlidingView().getWidth(), 0);
@@ -257,7 +270,7 @@ public class SwipeListView extends ListView{
             int factPos = mLastShowingPos - firstVisibleItemPos;
             mItemView = getChildAt(factPos);
             if(mItemView != null) {
-                mSwipeItemView = (SwipeItemView)mItemView.findViewById(R.id.swipe_item_view);
+                mSwipeItemView = (SwipeItemView)mItemView.findViewById(mSwipeItemViewID);
                 if(mSwipeItemView.getSlidingView() != null &&
                         mSwipeItemView.getScrollX() >=
                                 mSwipeItemView.getSlidingView().getWidth() / 2) {
@@ -279,7 +292,7 @@ public class SwipeListView extends ListView{
             int factPos = mLastShowingPos - firstVisibleItemPos;
             mItemView = getChildAt(factPos);
             if(mItemView != null) {
-                mSwipeItemView = (SwipeItemView)mItemView.findViewById(R.id.swipe_item_view);
+                mSwipeItemView = (SwipeItemView)mItemView.findViewById(mSwipeItemViewID);
                 View slidingView = mSwipeItemView.getSlidingView();
                 if(slidingView != null) {
                     int[] slidingViewLocation = new int[2];
