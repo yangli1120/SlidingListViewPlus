@@ -11,5 +11,6 @@
         android:clickable="true"
         swipeitemview:enableSliding="true"
         swipeitemview:primaryView="@layout/layout_item_primary_view"
-        swipeitemview:slidingView="@layout/layout_item_sliding_view" />
+        swipeitemview:slidingView="@layout/layout_item_sliding_view"
+        android:background="@drawable/swipe_item_view_bg" />
 </RelativeLayout>
