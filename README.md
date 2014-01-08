@@ -8,6 +8,7 @@ A custom ListView that its item view can been sliding left. Reference to the app
 <h1>Setup</h1>
 * In Eclipse, import this project as a Android library project.
 * Then add this project as a dependency to your project.
+* This widget support Android 2.x and later version which I had tested.
 
 <h1>Usage</h1>
 * In your activity layout file, use like follow, the SwipeListView has one attribute "swipeItemViewID" temporarily(I just thought one attribute now :P), and this attribute must been set, it's the resource ID of the SwipeItemView:
